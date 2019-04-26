@@ -79,69 +79,60 @@ public class MainActivity extends AppCompatActivity {
                             summe+=Math.abs(event.values[2]);
                             anzsumme++;
 
-                            if(event.values[2]>0){
+                            if(event.values[2]>0){              // linksdrehung
                                 txtRichtung.setText("<");
                                 if(flag == 0 ) starttimestamp = event.timestamp;
                                 flag=1;
                                 txtAnzLinks.setText("Links:\n" + links);
                             }
-                            if(event.values[2]<0) {
+                            if(event.values[2]<0) {              // rechtsdrehung
                                 txtRichtung.setText(">");
                                 if(flag == 0 ) starttimestamp = event.timestamp;
                                 flag=2;
                                 txtAnzRechts.setText("Rechts:\n" + rechts);
                             }
                         }else{
-                            txtRichtung.setText("|");
-                            if(flag == 1){
+                            txtRichtung.setText("|");           // keine drehung
+                            if(flag == 1){                      // linksdrehung beenden
                                 links++;
                                 flag =0;
                                 endtimestamp = event.timestamp;
 
-                                timesek = (endtimestamp-starttimestamp)*0.000000001;
-                                avgdeg = Math.toDegrees(summe)/anzsumme;
-
-                                txtsek.setText(String.valueOf(decimalFormat.format(timesek)) +" sek");
-                                txtgradsek.setText(String.valueOf(decimalFormat.format(avgdeg))+" °");
-                                txtGrad.setText(String.valueOf(decimalFormat.format(avgdeg*timesek))  + "°");
-                            }
-                            if(flag == 2){
+                                }
+                            if(flag == 2){                      // rechtsdrehung beenden
                                 rechts++;
                                 flag =0;
 
                                 endtimestamp = event.timestamp;
-
-                                timesek = (endtimestamp-starttimestamp)*0.000000001;
-                                avgdeg = Math.toDegrees(summe)/anzsumme;
-
-                                txtsek.setText(String.valueOf(decimalFormat.format(timesek)) +" sek");
-                                txtgradsek.setText(String.valueOf(decimalFormat.format(avgdeg))+" °");
-                                txtGrad.setText(String.valueOf(decimalFormat.format(avgdeg*timesek))  + "°");
                             }
+
+                            timesek = (endtimestamp-starttimestamp)*0.000000001;        //dauer in sek
+                            avgdeg = Math.toDegrees(summe)/anzsumme;                    //durchschnittliche drehung in °
+
+                            txtsek.setText(String.valueOf(decimalFormat.format(timesek)) +" sek");
+                            txtgradsek.setText(String.valueOf(decimalFormat.format(avgdeg))+" °");
+                            txtGrad.setText(String.valueOf(decimalFormat.format(avgdeg*timesek))  + "°"); // anzeigen der gradzahl ohne berücksichtigung des ACC
                         }
-                        break;
+                 break;
                 }
                 txtGyro.setText("X: " + decimalFormat.format(event.values[0])  + "\tY: " + decimalFormat.format(event.values[1]) + "\tZ: " + decimalFormat.format(event.values[2]));
-                //txtGrad.setText((summe/anzsumme)*;                 *(summe/anzsumme
+
             }
 
             @Override
             public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
             }
         };
-        sensorManager.registerListener(sensorEventListener,sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE),SensorManager.SENSOR_DELAY_FASTEST);
 
+        sensorManager.registerListener(sensorEventListener,sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE),SensorManager.SENSOR_DELAY_FASTEST);
 
         editTreshold.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
             }
 
             @Override
@@ -149,6 +140,5 @@ public class MainActivity extends AppCompatActivity {
                 tres = Double.valueOf(editTreshold.getText().toString());
             }
         });
-
     }
 }
