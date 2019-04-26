@@ -20,10 +20,22 @@ public class MainActivity extends AppCompatActivity {
     int links = 0;
     double tres = 0.5;
 
+    double summe;
+    int anzsumme;
+
+    long starttimestamp = 0;
+    long endtimestamp = 0;
+
+    double timesek;
+    double avgdeg;
+
     TextView txtRichtung;
     TextView txtGyro;
     TextView txtAnzRechts;
     TextView txtAnzLinks;
+    TextView txtGrad;
+    TextView txtgradsek;
+    TextView txtsek;
     EditText editTreshold;
 
     SensorManager sensorManager;
@@ -44,10 +56,13 @@ public class MainActivity extends AppCompatActivity {
         txtAnzRechts.setText("Rechts:\n" +rechts);
         txtAnzLinks = findViewById(R.id.txtAnzLinks);
         txtAnzLinks.setText("Links:\n" + links);
+        txtGrad = findViewById(R.id.txtGrad);
+        txtgradsek =  findViewById(R.id.txtgradsek);
+        txtsek = findViewById(R.id.txtsek);
 
 
 
-        decimalFormat = new DecimalFormat("00.00");
+        decimalFormat = new DecimalFormat("00.000");
 
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 
@@ -57,14 +72,22 @@ public class MainActivity extends AppCompatActivity {
 
                 switch (event.sensor.getType()) {
                     case Sensor.TYPE_GYROSCOPE:                 // Z Achse (event.values[2]) auslesen
+
+
                         if(Math.abs(event.values[2]) >= tres){   //treshold bestimmen
+
+                            summe+=Math.abs(event.values[2]);
+                            anzsumme++;
+
                             if(event.values[2]>0){
                                 txtRichtung.setText("<");
+                                if(flag == 0 ) starttimestamp = event.timestamp;
                                 flag=1;
                                 txtAnzLinks.setText("Links:\n" + links);
                             }
                             if(event.values[2]<0) {
                                 txtRichtung.setText(">");
+                                if(flag == 0 ) starttimestamp = event.timestamp;
                                 flag=2;
                                 txtAnzRechts.setText("Rechts:\n" + rechts);
                             }
@@ -73,15 +96,33 @@ public class MainActivity extends AppCompatActivity {
                             if(flag == 1){
                                 links++;
                                 flag =0;
+                                endtimestamp = event.timestamp;
+
+                                timesek = (endtimestamp-starttimestamp)*0.000000001;
+                                avgdeg = Math.toDegrees(summe)/anzsumme;
+
+                                txtsek.setText(String.valueOf(decimalFormat.format(timesek)) +" sek");
+                                txtgradsek.setText(String.valueOf(decimalFormat.format(avgdeg))+" °");
+                                txtGrad.setText(String.valueOf(decimalFormat.format(avgdeg*timesek))  + "°");
                             }
                             if(flag == 2){
                                 rechts++;
                                 flag =0;
+
+                                endtimestamp = event.timestamp;
+
+                                timesek = (endtimestamp-starttimestamp)*0.000000001;
+                                avgdeg = Math.toDegrees(summe)/anzsumme;
+
+                                txtsek.setText(String.valueOf(decimalFormat.format(timesek)) +" sek");
+                                txtgradsek.setText(String.valueOf(decimalFormat.format(avgdeg))+" °");
+                                txtGrad.setText(String.valueOf(decimalFormat.format(avgdeg*timesek))  + "°");
                             }
                         }
                         break;
                 }
                 txtGyro.setText("X: " + decimalFormat.format(event.values[0])  + "\tY: " + decimalFormat.format(event.values[1]) + "\tZ: " + decimalFormat.format(event.values[2]));
+                //txtGrad.setText((summe/anzsumme)*;                 *(summe/anzsumme
             }
 
             @Override
